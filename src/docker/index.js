@@ -13,7 +13,7 @@ export const run = thenify(::docker.run);
 export default docker;
 
 export const runBuild = (dirpath) => (
-  run(`reacthtmlpacktomchentwcom/build`, [`npm`, `start`], [process.stdout, process.stderr], {
+  run(process.env.DOCKER_BUILD_IMAGE_NAME, [`npm`, `start`], [process.stdout, process.stderr], {
     // https://docs.docker.com/engine/reference/api/docker_remote_api_v1.21/#create-a-container
     Tty: false,
     Env: [
@@ -22,7 +22,7 @@ export const runBuild = (dirpath) => (
     ],
     HostConfig: {
       Links: [
-        `meta_local-npm_1:local-npm`,
+        `${ process.env.DOCKER_LOCAL_NPM_CONTAINER_NAME }:local-npm`,
       ],
       VolumesFrom: [
         process.env.HOSTNAME, // http://stackoverflow.com/a/26979287
