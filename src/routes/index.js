@@ -125,7 +125,13 @@ router.get(`/events/:uuid`, async function getEventsRequest(context, next) {
 
   redisClient.on(`message`, (channel, message) => {
     assert.equal(channel, uuid);
-    stream.write(message);
+    try {
+      stream.write(message);
+    } catch (e) {
+      // FIXME: hack solution for:
+      // Error: Sending illegal frame (DATA) in CLOSED state.
+      console.error(e);
+    }
   });
   redisClient.subscribe(uuid);
   stream.write(`\n`);
