@@ -13,6 +13,10 @@ import {
 } from "mz/fs";
 
 import {
+  contentType as getType,
+} from "mime-types";
+
+import {
   default as KoaRouter,
 } from "koa-router";
 
@@ -96,8 +100,16 @@ router.post(`/`, async function buildRequest(context, next) {
   const pushPromiseList = (await glob(`**/*.*`, { cwd: publicPath }))
     .filter(it => it !== `index.html`)
     .map(it => {
-      const push = context.res.push(`/${ it }`);
-      push.writeHead(200);
+      const push = context.res.push(`/${ it }`, {
+        response: {
+          "Content-Type": getType(it),
+        },
+      });
+      push.on(`error`, error => {
+        // FIXME: hack solution for:
+        // Error: Sending illegal frame (DATA) in CLOSED state.
+        console.log(error);
+      });
 
       const stream = fs.createReadStream(resolvePath(publicPath, `./${ it }`));
       stream.pipe(push);

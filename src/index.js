@@ -8,8 +8,8 @@ import {
 } from "thenify";
 
 import {
-  default as http2,
-} from "http2";
+  default as spdy,
+} from "spdy";
 
 import {
   default as app,
@@ -46,10 +46,13 @@ async function startServer() {
     getCA(),
   ]);
 
-  const server = http2.createServer({
+  const server = spdy.createServer({
     key,
     cert,
     ca,
+    spdy: {
+      protocols: [`h2`],
+    },
   }, app.callback());
 
   return thenify(::server.listen)(3000);
