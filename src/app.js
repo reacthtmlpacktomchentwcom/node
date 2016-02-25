@@ -11,6 +11,10 @@ import {
 } from "koa-logger";
 
 import {
+  default as legacyKoaStaticCacheFactory,
+} from "koa-static-cache";
+
+import {
   default as legacyKoaStaticFactory,
 } from "koa-static";
 
@@ -26,9 +30,14 @@ const app = new Koa();
 
 app.use(koaLoggerFactory());
 
-app.use(koaConvert(legacyKoaStaticFactory(resolvePath(__dirname, `../public`), {
-  index: `index.html`,
+app.use(koaConvert(legacyKoaStaticCacheFactory(resolvePath(__dirname, `../public`), {
+  // Will NOT serve index.html
   gzip: true,
+})));
+
+app.use(koaConvert(legacyKoaStaticFactory(resolvePath(__dirname, `../public`), {
+  // Serving index.html ONLY
+  index: `index.html`,
 })));
 
 app
